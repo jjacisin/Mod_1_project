@@ -10,14 +10,17 @@ class Crime_Event(Base): #parent
     id=Column(Integer,primary_key=True)
     complaint_num=Column(Integer)
     precinct=Column(Text)
-    date_of_occurance=Column(Date)
-    time_of_occurance=Column(Integer)
+    date_of_occurance=Column(String)
+    time_of_occurance=Column(String)
     crime_completed_y_n=Column(Text)
     jurisdiction_code=Column(Text)
     jurisdiction_desc=Column(Text)
-    report_date=Column(Date)
+    report_date=Column(String)
     level_of_offense=Column(Text)
     offense_descr=Column(Text)
+    location_id = Column(Integer,ForeignKey('locations.id'))
+    victim_id = Column(Integer,ForeignKey('victims.id'))
+    suspect_id = Column(Integer,ForeignKey('suspects.id'))
 
     locations = relationship("Location",back_populates="crimes")
     victims = relationship("Victim",back_populates="crimes")
@@ -28,7 +31,6 @@ class Location(Base):
     id=Column(Integer,primary_key=True)
     latitude=Column(Float)
     longitude=Column(Float)
-    crime_id = Column(Integer, ForeignKey('crime_events.id'))
 
     crimes = relationship("Crime_Event",back_populates="locations")
 
@@ -39,7 +41,6 @@ class Victim(Base): #child
     age_group = Column(Text)
     race = Column(Text)
     gender = Column(Text)
-    crime_id = Column(Integer, ForeignKey('crime_events.id'))
 
     crimes = relationship("Crime_Event",back_populates="victims")
 
@@ -50,10 +51,9 @@ class Suspect(Base):
     age_group = Column(Text)
     race = Column(Text)
     gender = Column(Text)
-    crime_id = Column(Integer, ForeignKey('crime_events.id'))
 
     crimes = relationship("Crime_Event",back_populates="suspects")
 
 
-# engine = create_engine('sqlite:///crime_data.db')
-# Base.metadata.create_all(engine)
+engine = create_engine('sqlite:///crime_data.db')
+Base.metadata.create_all(engine)
