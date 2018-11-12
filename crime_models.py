@@ -9,7 +9,7 @@ class Crime_Event(Base): #parent
     __tablename__ = 'crime_events'
     id=Column(Integer,primary_key=True)
     complaint_num=Column(Integer)
-    precinct=Column(Text)
+    precinct=Column(Integer)
     date_of_occurance=Column(String)
     time_of_occurance=Column(String)
     crime_completed_y_n=Column(Text)
