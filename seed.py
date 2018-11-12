@@ -1,16 +1,16 @@
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from import_and_clean_data import  clean_data_test, cleaned_data_all
-from crime_models import *
+from import_and_clean_data import  cleaned_data_all #clean_data_test
+from crime_models import Crime_Event, Suspect, Victim, Location
 
-Base = declarative_base()
+# Base = declarative_base()
+engine = create_engine('sqlite:///crime_data.db')
+Session = sessionmaker(bind=engine)
+# session.configure(bind=engine)
+# Base.metadata.bind = engine
 
-session = sessionmaker()
-session.configure(bind=engine)
-Base.metadata.bind = engine
-
-session = session()
+session = Session()
 
 #functions to create crime_data objects
 def convert_to_classes_single(element):
@@ -21,8 +21,8 @@ def create_classes(data_set):
     new_list = []
     for i,value in enumerate(data_set):
         new_list.append(convert_to_classes_single(value))
-        if i % 100 == 0:
-            print(i)
+        if i % 50000 == 0:
+            print("seed value "+str(i))
     return new_list
 
 list_of_crime_event_objects = create_classes(cleaned_data_all)
