@@ -23,7 +23,7 @@ End Goal. Map chosen crime statistic/statistics
 Other thoughts:
   --table of five columns
   --group Data
-  --about three difference tables (JJ to CB: We might want to think about how to group data, perhaps by bureau?)
+  --about three difference tables (JJ to CB: We might want to think about how to group data, perhaps by boroughs?)
     --Is there a canned way to
   --write out plain SQL in SQLAlchemy
   --find initial data set, make it easy to explore

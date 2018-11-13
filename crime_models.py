@@ -10,7 +10,7 @@ class Crime_Event(Base): #parent
     id=Column(Integer,primary_key=True)
     complaint_num=Column(Integer)
     precinct=Column(Integer)
-    date_of_occurance=Column(String)
+    date_of_occurance=Column(Date)
     time_of_occurance=Column(String)
     crime_completed_y_n=Column(Text)
     jurisdiction_code=Column(Text)
