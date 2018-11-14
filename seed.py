@@ -13,8 +13,22 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 #functions to create crime_data objects
+def borough_finder(prct_num):
+    if prct_num <= 34:
+        return "Manhattan"
+    elif prct_num>=35 and prct_num<=52:
+        return "Bronx"
+    elif prct_num>=53 and prct_num<=94:
+        return "Brooklyn"
+    elif prct_num>=95 and prct_num<=115:
+        return "Queens"
+    elif prct_num>=116:
+        return "Staten Island"
+
+
+
 def convert_to_classes_single(element):
-    crime_event = Crime_Event(complaint_num=element['cmplnt_num'],precinct=element['addr_pct_cd'],date_of_occurance=element['cmplnt_fr_dt'],time_of_occurance=element['cmplnt_fr_tm'],crime_completed_y_n=element['crm_atpt_cptd_cd'],jurisdiction_code=element['jurisdiction_code'],jurisdiction_desc=element['juris_desc'],report_date=element['rpt_dt'],level_of_offense=element['law_cat_cd'],offense_descr=element['ofns_desc'],locations=Location(latitude=element['latitude'],longitude=element['longitude']),suspects = Suspect(age_group=element['susp_age_group'],race=element['susp_race'],gender=element['susp_sex']),victims = Victim(age_group=element['vic_age_group'],race=element['vic_race'],gender=element['vic_sex']))
+    crime_event = Crime_Event(complaint_num=element['cmplnt_num'],date_of_occurance=element['cmplnt_fr_dt'],time_of_occurance=element['cmplnt_fr_tm'],crime_completed_y_n=element['crm_atpt_cptd_cd'],jurisdiction_code=element['jurisdiction_code'],jurisdiction_desc=element['juris_desc'],report_date=element['rpt_dt'],level_of_offense=element['law_cat_cd'],offense_descr=element['ofns_desc'],locations=Location(latitude=element['latitude'],longitude=element['longitude'],precinct=element['addr_pct_cd'],borough=borough_finder(element['addr_pct_cd'],)),suspects = Suspect(age_group=element['susp_age_group'],race=element['susp_race'],gender=element['susp_sex']),victims = Victim(age_group=element['vic_age_group'],race=element['vic_race'],gender=element['vic_sex']))
     return crime_event
 
 def create_classes(data_set):

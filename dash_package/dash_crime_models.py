@@ -6,7 +6,6 @@ class Crime_Event(db.Model): #parent
     __tablename__ = 'crime_events'
     id=db.Column(db.Integer,primary_key=True)
     complaint_num=db.Column(db.Integer)
-    precinct=db.Column(db.Integer)
     date_of_occurance=db.Column(db.Date)
     time_of_occurance=db.Column(db.String)
     crime_completed_y_n=db.Column(db.Text)
@@ -28,6 +27,8 @@ class Location(db.Model):
     id=db.Column(db.Integer,primary_key=True)
     latitude=db.Column(db.Float)
     longitude=db.Column(db.Float)
+    precinct=db.Column(db.Integer)
+    borough=db.Column(db.Text)
 
     crimes = db.relationship("Crime_Event",back_populates="locations")
 

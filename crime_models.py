@@ -1,6 +1,8 @@
 from sqlalchemy import *
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
+from datetime import datetime
+
 
 Base = declarative_base()
 
@@ -9,9 +11,8 @@ class Crime_Event(Base): #parent
     __tablename__ = 'crime_events'
     id=Column(Integer,primary_key=True)
     complaint_num=Column(Integer)
-    precinct=Column(Integer)
-    date_of_occurance=Column(Date)
-    time_of_occurance=Column(String)
+    date_of_occurance=Column(String)
+    time_of_occurance=Column(Text)
     crime_completed_y_n=Column(Text)
     jurisdiction_code=Column(Text)
     jurisdiction_desc=Column(Text)
@@ -31,8 +32,11 @@ class Location(Base):
     id=Column(Integer,primary_key=True)
     latitude=Column(Float)
     longitude=Column(Float)
+    precinct=Column(Integer)
+    borough=Column(Text)
 
     crimes = relationship("Crime_Event",back_populates="locations")
+
 
 
 class Victim(Base): #child

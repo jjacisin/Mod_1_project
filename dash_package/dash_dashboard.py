@@ -24,14 +24,14 @@ def return_manhattan_crime_instances_in_month(month_input):
     num_days = calendar.monthrange(year, month)[1]
     start_date = datetime.date(year, month, 1)
     end_date = datetime.date(year, month, num_days)
-    return len(db.session.query(Crime_Event.report_date).filter(Crime_Event.report_date >= start_date, Crime_Event.report_date <= end_date,Crime_Event.precinct<=34).all())
+    return len(db.session.query(Crime_Event.report_date).join(Location).filter(Crime_Event.report_date >= start_date, Crime_Event.report_date <= end_date,Location.borough=="Manhattan").all())
 
 def crime_graph_creator():
-    month_crime_totals = list(map(lambda month:return_all_crime_objects_in_month(month),month_range))
+    month_crime_totals = list(map(lambda month:return_all_crime_instances_in_month(month),month_range))
     return {'x':month_names,'y':month_crime_totals}
 
-def crime_graph_creator():
-    month_crime_totals = list(map(lambda month:return_all_crime_objects_in_month(month),month_range))
+def crime_graph_creator_manhattan():
+    month_crime_totals = list(map(lambda month:return_manhattan_crime_instances_in_month(month),month_range))
     return {'x':month_names,'y':month_crime_totals}
 
 
@@ -50,8 +50,13 @@ app.layout = html.Div(
             dcc.Graph(figure=
             {'data': [crime_graph_creator()],
             'layout': {},
-            'name':'Overall'})
+            'name':'Overall'}),
+            dcc.Graph(figure=
+            {'data': [crime_graph_creator_manhattan()],
+            'layout': {},
+            'name':'Manhattan'})
             ]
+
         ),
         dcc.Tab(id='something', label='apartments',
             children=[
