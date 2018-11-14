@@ -4,6 +4,8 @@ import pandas as pd
 import csv
 import datetime
 import calendar
+import re
+import pdb
 
 engine = create_engine('sqlite:///crime_data.db')
 
@@ -11,8 +13,70 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 month_range = list(range(1,11))
-month_names = ['January','February','March','April','May','June','July','August','September','October']
+month_names = ['January','February','March','April','May','June']
 
+
+###############################################
+
+
+
+def SQLresListToStrList(SQLresList):
+    return [str(x) for x in SQLresList]
+
+def stringListSorter(stringList, startTrim, endTrim):
+    newList = list()
+
+    for x in stringList:
+        newList.append((re.search('%s(.*)%s'%(startTrim,endTrim), x)).group(2))
+    return newList
+
+def resultListFromDescr(resultList):
+    newList = list()
+    for x in resultList:
+        newList.append(x.offense_descr)
+        #pdb.set_trace()
+    return newList
+
+def setList1Count(inputList):
+    newDatDict = dict()
+    #pdb.set_trace()
+    listKeys = list(set(inputList))
+
+    #'Initialize '
+    for a in listKeys:
+        newDatDict[a] = 0
+        #'Fill'
+        for b in inputList:
+            if a == b:
+                newDatDict[a] += 1
+
+    return newDatDict
+
+def dictToDash(inputDict):
+    listX = list()
+    listY = list()
+
+    for a,b in inputDict.items():
+        listX.append(a)
+        listY.append(b)
+    return {'x': listX, 'y': listY}
+
+def SQLresListToStrList(SQLresList):
+    return [str(x) for x in SQLresList]
+
+####
+
+def return_crime_types_overall():
+    allOffensesList = session.query(Crime_Event.offense_descr).order_by(Crime_Event.date_of_occurance).all()
+    return allOffensesList
+
+####
+
+def crimeTypeQueryToDash(crimeTypeQuery):
+    return dictToDash(setList1Count(resultListFromDescr(crimeTypeQuery)))
+
+
+###############################################
 
 
 def return_len_of_all_crimes():
@@ -49,8 +113,8 @@ def felony_locations():
 # def set_list_of_precincts():
 #     return sorted(list(set(session.query(Crime_Event.precinct).all())))
 
-# def crime_in_manhattan():
-#     return session.query(Location.latitude, Location.longitude).join(Crime_Event).filter(Crime_Event.precinct<=34).all()
+def crime_in_manhattan():
+    return session.query(Location.latitude, Location.longitude).join(Crime_Event).filter(Location.borough=="Manhattan").all()
 #
 # def crimes_in_bronx():
 #     return session.query(Location.latitude, Location.longitude).join(Crime_Event).filter(Crime_Event.precinct>=35,Crime_Event.precinct<=52).all()
@@ -76,7 +140,7 @@ def return_all_crime_objects_in_month(month_input):
     num_days = calendar.monthrange(year, month)[1]
     start_date = datetime.date(year, month, 1)
     end_date = datetime.date(year, month, num_days)
-    return session.query(Crime_Event.date_of_occurance).filter(Crime_Event.date_of_occurance >= start_date, Crime_Event.date_of_occurance <= end_date).order_by(Crime_Event.date_of_occurance).all()
+    return session.query(Crime_Event).filter(Crime_Event.date_of_occurance >= start_date, Crime_Event.date_of_occurance <= end_date).order_by(Crime_Event.date_of_occurance).all()
 
 def return_lvl_of_offense_objects_in_month(month_input,type):
     all_month_data = return_all_crime_objects_in_month(month_input)
@@ -113,6 +177,55 @@ def borough_finder(prct_num):
         return "Queens"
     elif prct_num>=116:
         return "Staten Island"
+
+month_names = ['January','February','March','April','May','June']
+boroughs = ['Manhattan',"Brooklyn",'Bronx',"Queens",'Staten Island']
+
+def return_all_crime_instances_in_month(month_input):
+    year = 2018
+    month = month_input
+    num_days = calendar.monthrange(year, month)[1]
+    start_date = datetime.date(year, month, 1)
+    end_date = datetime.date(year, month, num_days)
+    return len(session.query(Crime_Event.report_date).filter(Crime_Event.report_date >= start_date, Crime_Event.report_date <= end_date).all())
+
+def crime_graph_creator():
+    month_crime_totals = list(map(lambda month:return_all_crime_instances_in_month(month),month_range))
+    return {'x':month_names,'y':month_crime_totals,'name':'Overall'}
+
+
+def return_all_crime_instances_in_month_for_boro(boro_input,month_input):
+    year = 2018
+    month = month_input
+    num_days = calendar.monthrange(year, month)[1]
+    start_date = datetime.date(year, month, 1)
+    end_date = datetime.date(year, month, num_days)
+    return len(session.query(Crime_Event.report_date).join(Location).filter(Crime_Event.report_date >= start_date, Crime_Event.report_date <= end_date,Location.borough==boro_input).all())
+
+def crime_graph_all_boroughs(boros,months):
+    output = []
+    for boro in boroughs:
+        total_list = []
+        for month in list(range(1,len(months)+1)):
+            month_total = return_all_crime_instances_in_month_for_boro(boro,month)
+            total_list.append(month_total)
+        output.append({'x':months,'y':total_list,'name':boro})
+    return output
+
+def return_felony_instances_in_month(month_input):
+    year = 2018
+    month = month_input
+    num_days = calendar.monthrange(year, month)[1]
+    start_date = datetime.date(year, month, 1)
+    end_date = datetime.date(year, month, num_days)
+    return len(session.query(Crime_Event.report_date).filter(Crime_Event.report_date >= start_date, Crime_Event.report_date <= end_date,Crime_Event.level_of_offense=="Felony").all())
+
+def felony_graph_creator():
+    month_crime_totals = list(map(lambda month:return_felony_instances_in_month(month),list(range(1,len(month_names)+1))))
+    return {'x':month_names,'y':month_crime_totals,'name':'Overall'}
+
+def off_desc_return():
+    return session.query(Crime_Event.offense_descr).all()
 
 # def return_all_crime_objects_in_manhattan_in_month(month_input):
 #     all_month_data = return_all_crime_objects_in_month(month_input)
