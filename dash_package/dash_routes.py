@@ -8,5 +8,9 @@ from dash_package import server
 @server.route('/first_complaint')
 def render_apartments():
     crime = Crime_Event.query.first()
-    return crime.complaint_num
-    # return render_template('index.html', apartments = apartments)
+    return str(crime.complaint_num)
+
+@server.route('/test')
+def render_apartments_2():
+    crime = Crime_Event.query.first()
+    return str(crime.complaint_num)
