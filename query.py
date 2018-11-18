@@ -1,5 +1,9 @@
 from crime_models import *
 from sqlalchemy import create_engine
+import folium
+from folium import plugins
+from folium.plugins import MarkerCluster
+import pandas as pd
 import pandas as pd
 import csv
 import datetime
@@ -227,6 +231,61 @@ def felony_graph_creator():
 def off_desc_return():
     return session.query(Crime_Event.offense_descr).all()
 
-# def return_all_crime_objects_in_manhattan_in_month(month_input):
-#     all_month_data = return_all_crime_objects_in_month(month_input)
-#     return list(filter(lambda event: event.pre))
+def robbery_locations():
+    return session.query(Location.latitude, Location.longitude).join(Crime_Event).filter(Crime_Event.offense_descr=="ROBBERY").all()
+
+##List of objects that includes the lat/lng of each crime_event
+##if list is less than 2000 elements group as other (i.e. <1%)
+
+def return_len_of_all_crimes():
+    return len(session.query(Crime_Event.crime_completed_y_n).all())
+
+total_crimes = return_len_of_all_crimes()
+
+def setlist_of_crime_event_objects():
+    return list(set(session.query(Crime_Event.offense_descr).all()))
+
+def fulllist_of_crime_event_objects():
+    return list(session.query(Crime_Event.offense_descr).all())
+
+def count_function_sorted_most_least_w_removal(unique_list, full_list):
+    CF=[]
+    CF_other = []
+    CF_other_names = []
+    for list_item in unique_list:
+        CF_dict = {}
+        CF_dict['key'] = list_item.offense_descr
+        CF_dict['count'] = full_list.count(list_item)
+        if full_list.count(list_item) > total_crimes*.005:
+            CF.append(CF_dict)
+        else:
+            CF_other.append(full_list.count(list_item))
+            CF_other_names.append(list_item.offense_descr)
+    CF.append({'key':'OTHER','count':sum(CF_other)})
+    #return CF_dict
+    return [sorted(CF, key=lambda k:k['count'],reverse=True),CF_other_names]
+
+ofns_occurances = count_function_sorted_most_least_w_removal(setlist_of_crime_event_objects(),fulllist_of_crime_event_objects())[0]
+
+drop_down_options = list(map(lambda x: x['key'],ofns_occurances))+['OTHER']
+
+other_ofns = count_function_sorted_most_least_w_removal(setlist_of_crime_event_objects(),fulllist_of_crime_event_objects())[1]
+
+#returns "OTHER" cluster; Defined by ofns_type that makes up > 5% of all crime; BUG: drops 'nan'/'None' values;
+def return_other_ofn_locations():
+    return session.query(Location.latitude, Location.longitude).join(Crime_Event).filter(Crime_Event.offense_descr.in_(other_ofns)).all()
+
+def return_ofns_type_locs(type):
+    return session.query(Location.latitude, Location.longitude).join(Crime_Event).filter(Crime_Event.offense_descr==type.upper()).all()
+
+#tri-boro bridge coordinates
+NY_COORDINATES = (40.7797, -73.9266)
+#inital map creation
+ny_map = folium.Map(location=NY_COORDINATES,tiles='Stamen Terrain',zoom_start=11)
+#insert
+
+def map_ofns_coord(coord_list):
+    marker_cluster = plugins.MarkerCluster(name=None).add_to(ny_map)
+    for item in coord_list:
+        folium.Marker([item.latitude,item.longitude]).add_to(marker_cluster)
+    return ny_map
