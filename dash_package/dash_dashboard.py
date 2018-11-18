@@ -1,14 +1,30 @@
 from dash_package.dash_queries import *
 # from folium import Iframe
-from dash_package.robbery_locations_1K import *
+# from dash_package.robbery_locations_1K import *
+
+
+
+
 
 
 app.layout = html.Div([
     html.H1('NYC Crime Clusters'),
-    html.Iframe(id='map',srcDoc = open('robbery_locations_1K.html', 'r').read(), width = '100%', height = '600')])
+    dcc.Dropdown(
+        id='my-dropdown',
+        options=drop_down_options,
+        placeholder = "Select an Offense"
+        # value=drop_down_options[0]['value']
+    ),
+    html.Div(id='output-container'),
+    html.Iframe(id='output-container',srcDoc = open('ROBBERY.html', 'r').read(), width = '100%', height = '600')])
 
-#
-#
+@app.callback(
+    dash.dependencies.Output('output-container', 'children'),
+    [dash.dependencies.Input('my-dropdown', 'value')])
+def update_output(value):
+    return 'You have selected "{}"'.format(value)
+
+
 #
 # app.layout = html.Div(
 #     children=[

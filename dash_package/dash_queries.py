@@ -79,6 +79,8 @@ def level_graph_all_boroughs(boros,months,type):
 
 ######## Offense Description Map Functions
 
+##Initial Map
+
 def return_len_of_all_crimes():
     return len(db.session.query(Crime_Event.crime_completed_y_n).all())
 
@@ -109,7 +111,21 @@ def count_function_sorted_most_least_w_removal(unique_list, full_list):
 
 ofns_occurances = count_function_sorted_most_least_w_removal(setlist_of_crime_event_objects(),fulllist_of_crime_event_objects())[0]
 
-drop_down_options = list(map(lambda x: x['key'],ofns_occurances))+['OTHER']
+option_values = list(map(lambda x: x['key'],ofns_occurances))+['OTHER']
+
+def option_creator(opt_vals):
+    s_vals = sorted(opt_vals)
+    oc_list = []
+    for val in s_vals:
+        oc_dict = {}
+        oc_dict['label'] = val.title()
+        oc_dict['value'] = val
+        oc_list.append(oc_dict)
+    return oc_list
+
+drop_down_options = option_creator(option_values)
+
+# new_list = [expression(i) for i in old_list if filter(i)]
 
 other_ofns = count_function_sorted_most_least_w_removal(setlist_of_crime_event_objects(),fulllist_of_crime_event_objects())[1]
 
