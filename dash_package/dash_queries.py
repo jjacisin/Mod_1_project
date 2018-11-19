@@ -111,16 +111,17 @@ def count_function_sorted_most_least_w_removal(unique_list, full_list):
 
 ofns_occurances = count_function_sorted_most_least_w_removal(setlist_of_crime_event_objects(),fulllist_of_crime_event_objects())[0]
 
-option_values = list(map(lambda x: x['key'],ofns_occurances))+['OTHER']
+option_values = list(map(lambda x: x['key'],ofns_occurances))
 
 def option_creator(opt_vals):
     s_vals = sorted(opt_vals)
     oc_list = []
     for val in s_vals:
-        oc_dict = {}
-        oc_dict['label'] = val.title()
-        oc_dict['value'] = val
-        oc_list.append(oc_dict)
+        if val != "SEX CRIMES":
+            oc_dict = {}
+            oc_dict['label'] = val.title()
+            oc_dict['value'] = val
+            oc_list.append(oc_dict)
     return oc_list
 
 drop_down_options = option_creator(option_values)
@@ -140,6 +141,7 @@ def return_ofns_type_locs(type):
 NY_COORDINATES = (40.7797, -73.9266)
 #inital map creation
 ny_map = folium.Map(location=NY_COORDINATES,tiles='Stamen Terrain',zoom_start=11)
+initial_display = ny_map.save('dash_package/map_storage/initial_map.html')
 #insert
 
 def map_ofns_coord(coord_list):
@@ -147,3 +149,19 @@ def map_ofns_coord(coord_list):
     for item in coord_list:
         folium.Marker([item.latitude,item.longitude]).add_to(marker_cluster)
     return ny_map
+
+def map_html_creator(value):
+    if value == "OTHER":
+        location_map = map_ofns_coord(return_other_ofn_locations())
+        location_map.save('dash_package/map_storage/"{}".html'.format(value))
+        # location_map.save('dash_package/map_storage/"{}".html').format(value)
+    else:
+        location_map = map_ofns_coord(return_ofns_type_locs(value))
+        location_map.save('dash_package/map_storage/"{}".html'.format(value))
+
+#create_all_html_maps
+#only need to run once to initialize
+# for value in option_values:
+#     if value != "SEX CRIMES":
+#         print(".....NOW PROCESSING....."+str(value))
+#         map_html_creator(value)
