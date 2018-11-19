@@ -140,8 +140,10 @@ def return_ofns_type_locs(type):
 #tri-boro bridge coordinates
 NY_COORDINATES = (40.7797, -73.9266)
 #inital map creation
-ny_map = folium.Map(location=NY_COORDINATES,tiles='Stamen Terrain',zoom_start=11)
-initial_display = ny_map.save('dash_package/map_storage/initial_map.html')
+
+ny_map = folium.Map(location=NY_COORDINATES,tiles='Stamen Terrain',zoom_start=10)
+initial_display_creator = ny_map.save('dash_package/map_storage/initial_map.html')
+initial_display = open('dash_package/map_storage/initial_map.html', 'r').read()
 #insert
 
 def map_ofns_coord(coord_list):
@@ -165,3 +167,188 @@ def map_html_creator(value):
 #     if value != "SEX CRIMES":
 #         print(".....NOW PROCESSING....."+str(value))
 #         map_html_creator(value)
+
+
+###################################################################BEGIN CB code
+
+def return_all_crime_instances_in_month(months):
+    year = 2018
+    num_days = calendar.monthrange(year, months)[1]
+    start_date = datetime.date(year, months, 1)
+    end_date = datetime.date(year, months, num_days)
+    return len(db.session.query(Crime_Event.report_date).filter(Crime_Event.report_date >= start_date, Crime_Event.report_date <= end_date).all())
+
+def crime_graph_creator():
+    month_crime_totals = list(map(lambda month:return_all_crime_instances_in_month(month),list(range(1,len(month_names)+1))))
+    return [{'x':month_names,'y':month_crime_totals,'name':'Overall'}]
+
+
+def return_all_crime_instances_in_month_for_boro(boro_input,month_input):
+    year = 2018
+    month = month_input
+    num_days = calendar.monthrange(year, month)[1]
+    start_date = datetime.date(year, month, 1)
+    end_date = datetime.date(year, month, num_days)
+    return len(db.session.query(Crime_Event.report_date).join(Location).filter(Crime_Event.report_date >= start_date, Crime_Event.report_date <= end_date,Location.borough==boro_input).all())
+
+def crime_graph_all_boroughs(boros,months):
+    output = []
+    for boro in boroughs:
+        total_list = []
+        for month in list(range(1,len(months)+1)):
+            month_total = return_all_crime_instances_in_month_for_boro(boro,month)
+            total_list.append(month_total)
+        output.append({'x':months,'y':total_list,'name':boro})
+    return output
+
+#def return_felony_instances_in_month_level(month_input,type):
+#    year = 2018
+#    month = month_input
+#    num_days = calendar.monthrange(year, month)[1]
+#    start_date = datetime.date(year, month, 1)
+#    end_date = datetime.date(year, month, num_days)
+#    return len(db.session.query(Crime_Event.report_date).filter(Crime_Event.report_date >= start_date, Crime_Event.report_date <= end_date,Crime_Event.level_of_offense==type).all())
+
+#def return_felony_instances_in_month_desc(months,type):
+#    years = 2018
+#    num_days = calendar.monthrange(years, months)[1]
+#    start_date = datetime.date(years, months, 1)
+#    end_date = datetime.date(years, months, num_days)
+#    return len(db.session.query(Crime_Event.report_date).filter(Crime_Event.report_date >= start_date, Crime_Event.report_date <= end_date,Crime_Event.offense_descr==type).all())
+
+def return_felony_instances_in_month_general(category,months,typeOf):
+    years = 2018
+    num_days = calendar.monthrange(years, months)[1]
+    start_date = datetime.date(years, months, 1)
+    end_date = datetime.date(years, months, num_days)
+    if category == 'level':
+        return len(db.session.query(Crime_Event.report_date).filter(Crime_Event.report_date >= start_date, Crime_Event.report_date <= end_date,Crime_Event.level_of_offense==typeOf).all())
+    if category == 'desc':
+        return len(db.session.query(Crime_Event.report_date).filter(Crime_Event.report_date >= start_date, Crime_Event.report_date <= end_date,Crime_Event.offense_descr==typeOf).all())
+    #If a condition is satisfied the below will not run.
+    print('Invalid Category Parameter!')
+    return None
+
+
+def general_graph_creator_all(category, typeOf, seriesName, chartType):
+    #category can be passed via dropdown list
+    if category == 'level' or 'desc':
+        month_crime_totals = list(map(lambda month:return_felony_instances_in_month_general(category,month,typeOf),list(range(1,len(month_names)+1))))
+        return [{'x':month_names,'y':month_crime_totals,'type':chartType,'name':seriesName}]
+    print('Invalid Category Parameter!')
+    return None
+
+def return_instances_in_month_for_boro_general(category,boro_input,months,typeOf):
+    year = 2018
+    num_days = calendar.monthrange(year, months)[1]
+    start_date = datetime.date(year, months, 1)
+    end_date = datetime.date(year, months, num_days)
+    if category == 'level':
+        return len(db.session.query(Crime_Event.report_date).join(Location).filter(Crime_Event.report_date >= start_date, Crime_Event.report_date <= end_date,Location.borough==boro_input,Crime_Event.level_of_offense==typeOf).all())
+    if category == 'desc':
+        return len(db.session.query(Crime_Event.report_date).join(Location).filter(Crime_Event.report_date >= start_date, Crime_Event.report_date <= end_date,Location.borough==boro_input,Crime_Event.offense_descr==typeOf).all())
+
+
+def general_graph_all_boroughs(category,boros,months,typeOf,chartType):
+    output = []
+    for boro in boros:
+        total_list = []
+        for month in list(range(1,len(months)+1)):
+            month_total = return_instances_in_month_for_boro_general(category,boro,month,typeOf)
+            total_list.append(month_total)
+        output.append({'x':months,'y':total_list,'type':chartType,'name':boro})
+    return output
+
+def generalDashWrapper(category,typeOf,boroughs,months,chartName,seriesName,chartTitle,chartType):
+    #category, typeOf, boroughs, months, title, chartyType, chartName, chartTitle
+    #return {'data': general_graph_creator_all(category,typeOf,seriesName,chartType)+general_graph_all_boroughs(category,boroughs,months,typeOf,chartType)+[{'type':chartType,'name':chartName}],'layout':{'title:chartTitle'}}
+    return {'data': general_graph_creator_all(category,typeOf,seriesName,chartType)+general_graph_all_boroughs(category,boroughs,months,typeOf,chartType),'layout':{'title':chartTitle}}
+
+###########
+#            dcc.Graph(figure=
+#            {'data': general_graph_creator_all('level',"Felony")+general_graph_all_boroughs('level',boroughs,month_names,"Felony"),
+#            'layout': {'title':'Felonies'}})
+#            ]
+#            dcc.Graph(figure=
+#            #This input could potentially be improved.
+#            {'data': [crimeTypeQueryToDash(off_desc_return(), 'bar', 'Types of Crime in New York')],
+#            'layout': {'title':'Types of Crime'}})
+
+def off_desc_return():
+    return db.session.query(Crime_Event.offense_descr).all()
+
+#def crimeTypeSelectToDash(selection, months):
+#    #parameters:
+#        #'selection' type string (nofil, boro, all)
+#            #nofil shows query without filter.
+#            #boro shows multiple chart elements
+#            #all shows both nofil and boro lists.
+
+#        #years and months are lists. Future parameters.
+
+#    #I expect these types to stay the same. Parameters can be made for generic formula.
+#    #Until the dropdown lists or checkboxes can be made, the parameter will be passed
+#    # directly into the dashboard function call.
+
+#    years = 2018
+#    num_days = calendar.monthrange(years, months)[1]
+#    start_date = datetime.date(years, months, 1)
+#    end_date = datetime.date(years, months, num_days)
+#    chartType = 'bar'
+#    chartName = 'Types of Crime in New York'
+#    resultList = list()
+#    tempList = list()
+#    keyList = list()
+#    queryDict = dict()
+#    queryAll = db.session.query(Crime_Event.offense_descr).all()
+        #Can become a generic parameter.
+#    if selection == 'nofil' or 'all':
+        #write the method to return the keys, values, and labels for
+        # an unfiltered query of crime types
+#        for x in queryAll:
+#            tempList.append(x.offense_descr)
+#        keyList = set(tempList)
+#        tempList = list()
+
+
+#        #Put transformed crime types list+dict here. Append it to resultList
+
+
+#    if selection == 'boro' or 'all':
+#        #write the method to return the keys, values, and labels for
+#        # a filtered query of crime types by borough.
+#        pass #Put transformed crime types list+dict here. Append it to resultList
+#        #make a loop for each unique key in the set of boroughs.
+
+
+def resultListFromDescr(resultList):
+    newList = list()
+    for x in resultList:
+        newList.append(x.offense_descr)
+    return newList
+
+def setList1Count(inputList):
+    newDatDict = dict()
+    listKeys = list(set(inputList))
+
+    #'Initialize '
+    for a in listKeys:
+        newDatDict[a] = 0
+        #'Fill'
+        for b in inputList:
+            if a == b:
+                newDatDict[a] += 1
+
+    return newDatDict
+
+def dictToDash(inputDict, chartType, chartName):
+    listX = list()
+    listY = list()
+
+    for a,b in inputDict.items():
+        listX.append(a)
+        listY.append(b)
+    return {'x': listX, 'y': listY, 'type': chartType, 'name': chartName}
+
+def crimeTypeQueryToDash(crimeTypeQuery, chartType, chartName):
+    return dictToDash(setList1Count(resultListFromDescr(crimeTypeQuery)), chartType, chartName)
