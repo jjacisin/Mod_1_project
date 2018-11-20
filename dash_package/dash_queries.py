@@ -141,12 +141,13 @@ def return_ofns_type_locs(type):
 NY_COORDINATES = (40.7797, -73.9266)
 #inital map creation
 
-ny_map = folium.Map(location=NY_COORDINATES,tiles='Stamen Terrain',zoom_start=10)
-initial_display_creator = ny_map.save('dash_package/map_storage/initial_map.html')
+ny_map_initial = folium.Map(location=NY_COORDINATES,tiles='Stamen Terrain',zoom_start=10)
+initial_display_creator = ny_map_initial.save('dash_package/map_storage/initial_map.html')
 initial_display = open('dash_package/map_storage/initial_map.html', 'r').read()
 #insert
 
 def map_ofns_coord(coord_list):
+    ny_map = folium.Map(location=NY_COORDINATES,tiles='Stamen Terrain',zoom_start=10)
     marker_cluster = plugins.MarkerCluster(name=None).add_to(ny_map)
     for item in coord_list:
         folium.Marker([item.latitude,item.longitude]).add_to(marker_cluster)
@@ -162,14 +163,14 @@ def map_html_creator(value):
         location_map.save('dash_package/map_storage/"{}".html'.format(value))
 
 #create_all_html_maps
-#only need to run once to initialize
+#only need to run once to initialize the html maps
 # for value in option_values:
 #     if value != "SEX CRIMES":
 #         print(".....NOW PROCESSING....."+str(value))
 #         map_html_creator(value)
 
 
-###################################################################BEGIN CB code
+######################################BEGIN CB code
 
 def return_all_crime_instances_in_month(months):
     year = 2018
