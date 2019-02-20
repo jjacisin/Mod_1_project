@@ -1,8 +1,6 @@
 from dash_package.dash_queries import *
 import dash
 from dash.dependencies import Input, Output
-# from folium import Iframe
-# from dash_package.robbery_locations_1K import *
 
 
 
