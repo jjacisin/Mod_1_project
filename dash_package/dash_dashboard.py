@@ -62,5 +62,6 @@ app.layout = html.Div([
     dash.dependencies.Output('output-container', 'srcDoc'),
     [dash.dependencies.Input('my-dropdown', 'value')])
 def update_output(value):
-    srcDoc = open('dash_package/map_storage/"{}".html'.format(value), 'r').read()
-    return srcDoc
+    if value != None:
+        srcDoc = open('dash_package/map_storage/{}.html'.format(value), 'r').read()
+        return srcDoc

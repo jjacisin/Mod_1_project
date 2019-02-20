@@ -156,14 +156,14 @@ def map_ofns_coord(coord_list):
 def map_html_creator(value):
     if value == "OTHER":
         location_map = map_ofns_coord(return_other_ofn_locations())
-        location_map.save('dash_package/map_storage/"{}".html'.format(value))
+        location_map.save('dash_package/map_storage/{}.html'.format(value))
         # location_map.save('dash_package/map_storage/"{}".html').format(value)
     else:
         location_map = map_ofns_coord(return_ofns_type_locs(value))
-        location_map.save('dash_package/map_storage/"{}".html'.format(value))
+        location_map.save('dash_package/map_storage/{}.html'.format(value))
 
-#create_all_html_maps
-#only need to run once to initialize the html maps
+# create_all_html_maps
+# only need to run once to initialize the html maps
 # for value in option_values:
 #     if value != "SEX CRIMES":
 #         print(".....NOW PROCESSING....."+str(value))
