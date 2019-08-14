@@ -43,3 +43,4 @@ def clean_vic_age(element,remove_list):
     return element['vic_age_group']
 
 cleaned_data_all = clean_crime_data_master(crime_data)
+print('clean data complete')

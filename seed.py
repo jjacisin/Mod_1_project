@@ -1,14 +1,14 @@
+import os
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from create_database.import_and_clean_data import  cleaned_data_all
-from dash_package.dash_crime_models import Crime_Event, Suspect, Victim, Location
+from create_database.crime_models import Crime_Event, Suspect, Victim, Location
 
-# Base = declarative_base()
-engine = create_engine('sqlite:///crime_data.db')
+db_name = "crime_data.db"
+
+engine = create_engine('sqlite:///'+db_name)
 Session = sessionmaker(bind=engine)
-# session.configure(bind=engine)
-# Base.metadata.bind = engine
 
 session = Session()
 
@@ -23,32 +23,10 @@ def borough_finder(prct_num):
     elif prct_num>=95 and prct_num<=115:
         return "Queens"
     elif prct_num>=116:
-        return "Staten Island"\
+        return "Staten Island"
 
 def convert_to_classes_single(element):
-    crime_event = Crime_Event(
-    complaint_num=element['cmplnt_num'],
-    date_of_occurance=element['cmplnt_fr_dt'],
-    time_of_occurance=element['cmplnt_fr_tm'],
-    crime_completed_y_n=element['crm_atpt_cptd_cd'],
-    jurisdiction_code=element['jurisdiction_code'],
-    jurisdiction_desc=element['juris_desc'],
-    report_date=element['rpt_dt'],
-    level_of_offense=element['law_cat_cd'],
-    offense_descr=element['ofns_desc'],
-    locations=
-        Location(latitude=element['latitude'],
-            longitude=element['longitude'],
-            precinct=element['addr_pct_cd'],
-            borough=borough_finder(element['addr_pct_cd'],)),
-    suspects=
-        Suspect(age_group=element['susp_age_group'],
-            race=element['susp_race'],
-            gender=element['susp_sex']),
-    victims=
-        Victim(age_group=element['vic_age_group'],
-            race=element['vic_race'],
-            gender=element['vic_sex']))
+    crime_event = Crime_Event(complaint_num=element['cmplnt_num'],date_of_occurance=element['cmplnt_fr_dt'],time_of_occurance=element['cmplnt_fr_tm'],crime_completed_y_n=element['crm_atpt_cptd_cd'],jurisdiction_code=element['jurisdiction_code'],jurisdiction_desc=element['juris_desc'],report_date=element['rpt_dt'],level_of_offense=element['law_cat_cd'],offense_descr=element['ofns_desc'],locations=Location(latitude=element['latitude'],longitude=element['longitude'],precinct=element['addr_pct_cd'],borough=borough_finder(element['addr_pct_cd'],)),suspects = Suspect(age_group=element['susp_age_group'],race=element['susp_race'],gender=element['susp_sex']),victims = Victim(age_group=element['vic_age_group'],race=element['vic_race'],gender=element['vic_sex']))
     return crime_event
 
 def create_classes(data_set):
@@ -64,3 +42,5 @@ list_of_crime_event_objects = create_classes(cleaned_data_all)
 
 session.add_all(list_of_crime_event_objects)
 session.commit()
+
+os.rename(db_name, 'dash_package/'+db_name)
