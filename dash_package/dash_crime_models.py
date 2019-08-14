@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, Text, Date
-from dash_package import db
+from dash_package.flask_init import db
 
 
 class Crime_Event(db.Model): #parent

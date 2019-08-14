@@ -1,11 +1,9 @@
 import pandas as pd
 
-
 records = pd.read_json("https://data.cityofnewyork.us/resource/7x9x-zpz6.json?$limit=300000")
 crime_data = records.to_dict('records')
 
-#clean functions are below
-
+#Cleaning Functions
 def clean_crime_data_master(data):
     print("pre-age-check")
     bad_ages = bad_ages_finder(data)
@@ -17,7 +15,7 @@ def clean_crime_data_master(data):
         x['law_cat_cd'] = x['law_cat_cd'].title()
         x['susp_age_group'] = clean_susp_age(x,bad_ages)
         x['vic_age_group'] = clean_vic_age(x,bad_ages)
-        if i % 100000 == 0:
+        if i % 50000 == 0:
             print("clean value "+str(i))
     return cleaned_data
 
@@ -45,6 +43,3 @@ def clean_vic_age(element,remove_list):
     return element['vic_age_group']
 
 cleaned_data_all = clean_crime_data_master(crime_data)
-
-
-# clean_data_test = clean_crime_data_master(crime_data[0:201])
