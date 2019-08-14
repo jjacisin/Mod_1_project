@@ -202,21 +202,6 @@ def crime_graph_all_boroughs(boros,months):
         output.append({'x':months,'y':total_list,'name':boro})
     return output
 
-#def return_felony_instances_in_month_level(month_input,type):
-#    year = 2018
-#    month = month_input
-#    num_days = calendar.monthrange(year, month)[1]
-#    start_date = datetime.date(year, month, 1)
-#    end_date = datetime.date(year, month, num_days)
-#    return len(db.session.query(Crime_Event.report_date).filter(Crime_Event.report_date >= start_date, Crime_Event.report_date <= end_date,Crime_Event.level_of_offense==type).all())
-
-#def return_felony_instances_in_month_desc(months,type):
-#    years = 2018
-#    num_days = calendar.monthrange(years, months)[1]
-#    start_date = datetime.date(years, months, 1)
-#    end_date = datetime.date(years, months, num_days)
-#    return len(db.session.query(Crime_Event.report_date).filter(Crime_Event.report_date >= start_date, Crime_Event.report_date <= end_date,Crime_Event.offense_descr==type).all())
-
 def return_felony_instances_in_month_general(category,months,typeOf):
     years = 2018
     num_days = calendar.monthrange(years, months)[1]
@@ -265,62 +250,8 @@ def generalDashWrapper(category,typeOf,boroughs,months,chartName,seriesName,char
     #return {'data': general_graph_creator_all(category,typeOf,seriesName,chartType)+general_graph_all_boroughs(category,boroughs,months,typeOf,chartType)+[{'type':chartType,'name':chartName}],'layout':{'title:chartTitle'}}
     return {'data': general_graph_creator_all(category,typeOf,seriesName,chartType)+general_graph_all_boroughs(category,boroughs,months,typeOf,chartType),'layout':{'title':chartTitle}}
 
-###########
-#            dcc.Graph(figure=
-#            {'data': general_graph_creator_all('level',"Felony")+general_graph_all_boroughs('level',boroughs,month_names,"Felony"),
-#            'layout': {'title':'Felonies'}})
-#            ]
-#            dcc.Graph(figure=
-#            #This input could potentially be improved.
-#            {'data': [crimeTypeQueryToDash(off_desc_return(), 'bar', 'Types of Crime in New York')],
-#            'layout': {'title':'Types of Crime'}})
-
 def off_desc_return():
     return db.session.query(Crime_Event.offense_descr).all()
-
-#def crimeTypeSelectToDash(selection, months):
-#    #parameters:
-#        #'selection' type string (nofil, boro, all)
-#            #nofil shows query without filter.
-#            #boro shows multiple chart elements
-#            #all shows both nofil and boro lists.
-
-#        #years and months are lists. Future parameters.
-
-#    #I expect these types to stay the same. Parameters can be made for generic formula.
-#    #Until the dropdown lists or checkboxes can be made, the parameter will be passed
-#    # directly into the dashboard function call.
-
-#    years = 2018
-#    num_days = calendar.monthrange(years, months)[1]
-#    start_date = datetime.date(years, months, 1)
-#    end_date = datetime.date(years, months, num_days)
-#    chartType = 'bar'
-#    chartName = 'Types of Crime in New York'
-#    resultList = list()
-#    tempList = list()
-#    keyList = list()
-#    queryDict = dict()
-#    queryAll = db.session.query(Crime_Event.offense_descr).all()
-        #Can become a generic parameter.
-#    if selection == 'nofil' or 'all':
-        #write the method to return the keys, values, and labels for
-        # an unfiltered query of crime types
-#        for x in queryAll:
-#            tempList.append(x.offense_descr)
-#        keyList = set(tempList)
-#        tempList = list()
-
-
-#        #Put transformed crime types list+dict here. Append it to resultList
-
-
-#    if selection == 'boro' or 'all':
-#        #write the method to return the keys, values, and labels for
-#        # a filtered query of crime types by borough.
-#        pass #Put transformed crime types list+dict here. Append it to resultList
-#        #make a loop for each unique key in the set of boroughs.
-
 
 def resultListFromDescr(resultList):
     newList = list()
@@ -330,7 +261,8 @@ def resultListFromDescr(resultList):
 
 def setList1Count(inputList):
     newDatDict = dict()
-    listKeys = list(set(inputList))
+    cleanedList = [i for i in inputList if i]
+    listKeys = sorted(list(set(cleanedList)))
 
     #'Initialize '
     for a in listKeys:

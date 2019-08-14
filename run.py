@@ -1,3 +1,4 @@
 from dash_package import *
-
-app.run_server(debug = True)
+print('running')
+app.run_server(debug = True,host=local_server_ip,port=port)
+print('finished')

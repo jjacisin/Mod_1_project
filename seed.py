@@ -1,8 +1,8 @@
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from import_and_clean_data import  cleaned_data_all #clean_data_test
-from crime_models import Crime_Event, Suspect, Victim, Location
+from create_database.import_and_clean_data import  cleaned_data_all #clean_data_test
+from dash_package.dash_crime_models import Crime_Event, Suspect, Victim, Location
 
 # Base = declarative_base()
 engine = create_engine('sqlite:///crime_data.db')
@@ -23,9 +23,7 @@ def borough_finder(prct_num):
     elif prct_num>=95 and prct_num<=115:
         return "Queens"
     elif prct_num>=116:
-        return "Staten Island"
-
-
+        return "Staten Island"\
 
 def convert_to_classes_single(element):
     crime_event = Crime_Event(complaint_num=element['cmplnt_num'],date_of_occurance=element['cmplnt_fr_dt'],time_of_occurance=element['cmplnt_fr_tm'],crime_completed_y_n=element['crm_atpt_cptd_cd'],jurisdiction_code=element['jurisdiction_code'],jurisdiction_desc=element['juris_desc'],report_date=element['rpt_dt'],level_of_offense=element['law_cat_cd'],offense_descr=element['ofns_desc'],locations=Location(latitude=element['latitude'],longitude=element['longitude'],precinct=element['addr_pct_cd'],borough=borough_finder(element['addr_pct_cd'],)),suspects = Suspect(age_group=element['susp_age_group'],race=element['susp_race'],gender=element['susp_sex']),victims = Victim(age_group=element['vic_age_group'],race=element['vic_race'],gender=element['vic_sex']))

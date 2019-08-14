@@ -9,11 +9,6 @@ app.layout = html.Div([
     html.Div([
         html.H2('Crime by Level of Offense & Offense Description Graph'),
         dcc.Tabs(id="tabs", children=[
-            ############################################################
-            ###Common theme identified: calling query via a specific value of a field.
-            ####This can be streamlined via automatic key creation and through sets.
-            #####All 4 of these tabs can be shortened into a single tab,
-            ###### which picks traces based on input from a dropdown list.
             dcc.Tab(id='NYC', label='Crimes by Borough',
                 children=[
                 dcc.Graph(figure=
@@ -37,15 +32,12 @@ app.layout = html.Div([
                 dcc.Graph(figure=generalDashWrapper('level','Violation',boroughs,month_names,'Violations','All Violations','Violations','line'))
                 ]
             ),
-            ###Notes found for the above graphs. See note at top.
-            #####################################
             dcc.Tab(id='Types', label='Types of Crime',
                 children=[
                 dcc.Graph(figure=
-                #This input could potentially be improved.
                 {'data': [crimeTypeQueryToDash(off_desc_return(), 'bar', 'Types of Crime in New York')],
-                'layout': {'title':'Types of Crime'}})
-                ]
+                'layout': {'title':'Types of Crime','marker_color':'crimson'}},
+                )]
             ),
             ])
         ]),
