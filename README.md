@@ -1,5 +1,5 @@
 
-# NYC COMPLAINT VISUALIZATION:  JANUARY - JUNE 2018
+# Visualizing NYC Complaint Data - 1H 2018
 
 <img src='img/nyc_open_data_logo.png'>
 
@@ -7,11 +7,11 @@ Using NYC Open Data, create an app that includes multiple visualizations, includ
 
 ## Motivation
 
-The goal of this project is to explore the complaint data provided by NYPD and make meaningful observations using a visually appealing and interesting web app, while creating a relational database that is actively referenced by the app. 
+The goal of this project is to explore the complaint data provided by NYPD and make meaningful observations using a visually appealing and interesting web app, while creating a relational database that is actively referenced by the app.
 
 ## Background Information
 
-NYC Open Data is the preeminent source for a trove of data sets for New York City. With over 1200 datasets avaialble, it provides information on many of the city's hundreds of departments and allows for anyone willing to delve into a topic of their choosing to understand the city through its vast data resources. 
+NYC Open Data is the preeminent source for a trove of data sets for New York City. With over 1200 datasets avaialble, it provides information on many of the city's hundreds of departments and allows for anyone willing to delve into a topic of their choosing to understand the city through its vast data resources.
 
 All of this information is given so that the government and people of New York can better understand a immensely complex society and for others to potentially provide ideas and innovations to improve living in the city.
 
@@ -19,7 +19,7 @@ All of this information is given so that the government and people of New York c
 
 ## Data Extraction and Storage
 
-My first step was choosing which dataset that would provide the complexity and diversity of information for the scale of a project of this nature, yet also being accessible enough for my first attempt at exploring a data science-type project. 
+My first step was choosing which dataset that would provide the complexity and diversity of information for the scale of a project of this nature, yet also being accessible enough for my first attempt at exploring a data science-type project.
 
 The complaint data provided ~229,000 unique entries spanning the first six months of 2018 and included a variety of data points including a categorized crime description, the latitude and longitude coordinates of the complaint, complaint date, and high-level suspect and victim information.
 
@@ -27,13 +27,13 @@ The data was pulled using the Open Data's API, filtered through a custom-built O
 
 ## Visualization Platform
 
-The next step was to utilize the Flask and Dash platforms to create a visually appealing web app to present the data stored within the database. 
+The next step was to utilize the Flask and Dash platforms to create a visually appealing web app to present the data stored within the database.
 
 <img src='img/dash_code_example.png'>
 
 ### App Initialization
 
-    1) App activation file that can be referenced in terminal to begin initialization. 
+    1) App activation file that can be referenced in terminal to begin initialization.
     2) Flask initialization:
         -- Configures database to app using SQLAlchemy, which will allow the app to perform SQL queries
         -- Import Dashboard file
@@ -60,7 +60,7 @@ The next step was to utilize the Flask and Dash platforms to create a visually a
            -- User can:
                -- Interact with the map to gain more information about a complaint at a given location
                -- Select a new description from the drop down to bring up a new map
-           
+
 *See 'dash_query' file for html file creation
 
 <img src='img/cluster_example.png'>
